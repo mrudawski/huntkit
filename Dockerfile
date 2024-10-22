@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM kalilinux/kali-rolling
 
 LABEL maintainer="Matt McNamee"
 
@@ -53,8 +53,7 @@ RUN apt-get update && \
   wget \
   whois \
   zip \
-  unzip \
-  zsh && \
+  unzip && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*
 
@@ -87,10 +86,7 @@ RUN apt-get update && \
   libxml2-dev \
   libxslt1-dev \
   ruby-dev \
-  zlib1g-dev \
-  # zsh
-  fonts-powerline \
-  powerline && \
+  zlib1g-dev && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*
 
@@ -104,10 +100,6 @@ RUN cd /opt && \
 
 # Install Python common dependencies
 RUN python3 -m pip install --upgrade setuptools paramiko --break-system-packages
-
-# Install ZSH
-RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended \
-  chsh -s $(which zsh)
 
 # ------------------------------
 # --- Tools ---
@@ -176,7 +168,7 @@ RUN go install github.com/ffuf/ffuf@latest
 
 # gau
 RUN go install github.com/lc/gau/v2/cmd/gau@latest && \
-  echo "alias gau='/go/bin/gau'" >> ~/.zshrc
+  echo "alias gau='/go/bin/gau'" >> ~/.bashrc
 
 # httpx
 RUN go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
@@ -192,7 +184,7 @@ RUN git clone --depth 1 https://github.com/codingo/Interlace.git $TOOLS/interlac
 # john the ripper
 RUN git clone --depth 1 https://github.com/magnumripper/JohnTheRipper $TOOLS/john && \
   cd $TOOLS/john/src && \
-  echo "alias john='${TOOLS}/john/run/john'" >> ~/.zshrc && \
+  echo "alias john='${TOOLS}/john/run/john'" >> ~/.bashrc && \
   ./configure && make -s clean && make -sj4
 
 # jwttool
@@ -350,13 +342,11 @@ RUN curl -L https://github.com/praetorian-code/Hob0Rules/raw/db10d30b0e4295a648b
   gunzip $WORDLISTS/rockyou.txt.gz
 
 # Symlink other wordlists
-RUN ln -sf $( find /go/pkg/mod/github.com/\!o\!w\!a\!s\!p/\!amass -name wordlists ) $WORDLISTS/amass && \
+RUN ln -sf $( find /go/pkg/mod/github.com/owasp-amass/amass -name wordlists ) $WORDLISTS/amass && \
   ln -sf /usr/share/brutespray/wordlist $WORDLISTS/brutespray && \
   ln -sf /usr/share/dirb/wordlists $WORDLISTS/dirb && \
-  ln -sf /usr/share/setoolkit/src/fasttrack/wordlist.txt $WORDLISTS/fasttrack.txt && \
   ln -sf /opt/metasploit-framework/embedded/framework/data/wordlists $WORDLISTS/metasploit && \
   ln -sf /usr/share/nmap/nselib/data/passwords.lst $WORDLISTS/nmap.lst && \
-  ln -sf /etc/theHarvester/wordlists $WORDLISTS/theharvester
 
 # ------------------------------
 # --- Other utilities ---
@@ -389,15 +379,7 @@ RUN echo "dynamic_chain" > /etc/proxychains.conf && \
   echo "socks5 127.0.0.1 9050" >> /etc/proxychains.conf
 
 # Common commands (aliases)
-RUN echo "alias myip='dig +short myip.opendns.com @resolver1.opendns.com'" >> ~/.zshrc
-
-# ZSH config
-RUN sed -i 's^ZSH_THEME="robbyrussell"^ZSH_THEME="bira"^g' ~/.zshrc && \
-  sed -i 's^# DISABLE_UPDATE_PROMPT="true"^DISABLE_UPDATE_PROMPT="true"^g' ~/.zshrc && \
-  sed -i 's^# DISABLE_AUTO_UPDATE="true"^DISABLE_AUTO_UPDATE="true"^g' ~/.zshrc && \
-  sed -i 's^plugins=(git)^plugins=(tmux nmap)^g' ~/.zshrc && \
-  echo 'export EDITOR="nano"' >> ~/.zshrc && \
-  git config --global oh-my-zsh.hide-info 1
+RUN echo "alias myip='dig +short myip.opendns.com @resolver1.opendns.com'" >> ~/.bashrc
 
 # Clean up space - remove version control
 RUN cd $HOME && find . -name '.git' -type d -exec rm -rf {} + && \
@@ -412,4 +394,4 @@ RUN cd $HOME && find . -name '.git' -type d -exec rm -rf {} + && \
 
 # Start up commands
 ENTRYPOINT ["bash", "/startup.sh"]
-CMD ["/bin/zsh"]
+CMD ["/bin/bash"]
