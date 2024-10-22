@@ -32,6 +32,7 @@ RUN apt-get update && \
   git \
   iputils-ping \
   jq \
+  less \
   libgmp-dev \
   libpcap-dev \
   make \
@@ -49,6 +50,7 @@ RUN apt-get update && \
   ssh \
   tor \
   tmux \
+  tree \
   tzdata \
   wget \
   whois \
