@@ -286,7 +286,7 @@ unzip awscliv2.zip && \
 ./aws/install && \
 ln -sf /usr/local/bin/aws /usr/bin/aws && \
 aws --version && \
-rm -f awscliv2.zip
+rm -rf aws awscliv2.zip
 
 # subjs
 RUN go install -v github.com/lc/subjs@latest
