@@ -25,7 +25,6 @@ RUN mkdir $WORDLISTS && mkdir $ADDONS
 RUN apt-get update && \
   apt-get install -y --no-install-recommends --fix-missing \
   apt-utils \
-  awscli \
   build-essential \
   curl \
   dnsutils \
@@ -37,7 +36,7 @@ RUN apt-get update && \
   libpcap-dev \
   make \
   nano \
-  netcat \
+  netcat-traditional \
   net-tools \
   nodejs \
   npm \
@@ -46,6 +45,7 @@ RUN apt-get update && \
   proxychains \
   python3 \
   python3-pip \
+  python3-wheel \
   ssh \
   tor \
   tmux \
@@ -103,7 +103,7 @@ RUN cd /opt && \
   mv go /usr/local
 
 # Install Python common dependencies
-RUN python3 -m pip install --upgrade setuptools wheel paramiko
+RUN python3 -m pip install --upgrade setuptools paramiko --break-system-packages
 
 # Install ZSH
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended \
@@ -133,7 +133,7 @@ RUN git clone --depth 1 https://github.com/hmaverickadams/breach-parse.git $TOOL
 # cloudflair
 RUN git clone --depth 1 https://github.com/christophetd/CloudFlair.git $TOOLS/cloudflair && \
   cd $TOOLS/cloudflair && \
-  python3 -m pip install -r requirements.txt && \
+  python3 -m pip install -r requirements.txt --break-system-packages && \
   sed -i 's^#!/usr/bin/env python3^#!/usr/bin/python3^g' cloudflair.py && \
   chmod a+x cloudflair.py && \
   ln -sf $TOOLS/cloudflair/cloudflair.py /usr/local/bin/cloudflair
@@ -184,7 +184,7 @@ RUN go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
 # interlace
 RUN git clone --depth 1 https://github.com/codingo/Interlace.git $TOOLS/interlace && \
   cd $TOOLS/interlace && \
-  python3 -m pip install -r requirements.txt && \
+  python3 -m pip install -r requirements.txt --break-system-packages && \
   python3 setup.py install && \
   chmod a+x Interlace/interlace.py && \
   ln -sf $TOOLS/interlace/Interlace/interlace.py /usr/local/bin/interlace
@@ -198,14 +198,14 @@ RUN git clone --depth 1 https://github.com/magnumripper/JohnTheRipper $TOOLS/joh
 # jwttool
 RUN git clone --depth 1 https://github.com/ticarpi/jwt_tool $TOOLS/jwttool && \
   cd $TOOLS/jwttool && \
-  python3 -m pip install pycryptodomex termcolor && \
+  python3 -m pip install pycryptodomex termcolor --break-system-packages && \
   chmod a+x jwt_tool.py && \
   ln -sf $TOOLS/jwttool/jwt_tool.py /usr/local/bin/jwttool
 
 # link finder
 RUN git clone --depth 1 https://github.com/GerbenJavado/LinkFinder.git $TOOLS/linkfinder && \
   cd $TOOLS/linkfinder && \
-  python3 -m pip install -r requirements.txt && \
+  python3 -m pip install -r requirements.txt --break-system-packages && \
   python3 setup.py install && \
   sed -i 's^#!/usr/bin/env python^#!/usr/bin/python3^g' linkfinder.py && \
   chmod a+x linkfinder.py && \
@@ -234,7 +234,7 @@ RUN go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest && \
 # pagodo
 RUN git clone --depth 1 https://github.com/opsdisk/pagodo.git $TOOLS/pagodo && \
   cd $TOOLS/pagodo && \
-  python3 -m pip install -r requirements.txt && \
+  python3 -m pip install -r requirements.txt --break-system-packages && \
   sed -i 's^#!/usr/bin/env python^#!/usr/bin/python3^g' pagodo.py && \
   python3 ghdb_scraper.py -j -s && \
   chmod a+x pagodo.py && \
@@ -243,25 +243,50 @@ RUN git clone --depth 1 https://github.com/opsdisk/pagodo.git $TOOLS/pagodo && \
 # recon-ng
 RUN git clone --depth 1 https://github.com/lanmaster53/recon-ng.git $TOOLS/recon-ng && \
   cd $TOOLS/recon-ng && \
-  python3 -m pip install -r REQUIREMENTS && \
+  python3 -m pip install -r REQUIREMENTS --break-system-packages && \
   chmod a+x recon-ng && \
   ln -sf $TOOLS/recon-ng/recon-ng /usr/local/bin/recon-ng
 
 # sherlock
 RUN git clone --depth 1 https://github.com/sherlock-project/sherlock $TOOLS/sherlock && \
   cd $TOOLS/sherlock && \
-  python3 -m pip install -r requirements.txt && \
-  chmod a+x sherlock/sherlock.py && \
+  python3 -m pip install sherlock-project --break-system-packages && \
+  chmod a+x sherlock_project/sherlock.py && \
   ln -sf $TOOLS/sherlock/sherlock/sherlock.py /usr/local/bin/sherlock
 
 # social engineer toolkit
 RUN git clone --depth 1 https://github.com/trustedsec/social-engineer-toolkit $TOOLS/setoolkit && \
   cd $TOOLS/setoolkit && \
-  python3 -m pip install -r requirements.txt || : && \
+  python3 -m pip install -r requirements.txt --break-system-packages || : && \
   python3 setup.py || :
 
 # subfinder
 RUN go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
+
+# assetfinder
+RUN go install -v github.com/tomnomnom/assetfinder@latest
+
+# subzy
+RUN go install -v github.com/PentestPad/subzy@latest
+
+# arjun
+RUN git clone --depth 1 https://github.com/s0md3v/Arjun $TOOLS/arjun && \
+  cd $TOOLS/arjun && \
+  python3 setup.py install
+
+# socialhunter
+RUN go install -v github.com/utkusen/socialhunter@latest
+
+# gowitness
+RUN go install github.com/sensepost/gowitness@latest
+
+# awscliv2
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+unzip awscliv2.zip && \
+./aws/install && \
+ln -sf /usr/local/bin/aws /usr/bin/aws && \
+aws --version && \
+rm -f awscliv2.zip
 
 # subjs
 RUN go install -v github.com/lc/subjs@latest
@@ -269,7 +294,7 @@ RUN go install -v github.com/lc/subjs@latest
 # sublist3r
 RUN git clone --depth 1 https://github.com/aboul3la/Sublist3r.git $TOOLS/sublist3r && \
   cd $TOOLS/sublist3r && \
-  python3 -m pip install -r requirements.txt && \
+  python3 -m pip install -r requirements.txt --break-system-packages && \
   sed -i 's^#!/usr/bin/env python^#!/usr/bin/python3^g' sublist3r.py && \
   chmod a+x sublist3r.py && \
   ln -sf $TOOLS/sublist3r/sublist3r.py /usr/local/bin/sublist3r
@@ -278,8 +303,8 @@ RUN git clone --depth 1 https://github.com/aboul3la/Sublist3r.git $TOOLS/sublist
 # Note: it needs to be installed in /etc/ as there are absolute refs in the code
 RUN git clone --depth 1 https://github.com/laramies/theHarvester /etc/theHarvester && \
   cd /etc/theHarvester && \
-  python3 -m pip install pipenv && \
-  python3 -m pip install -r requirements/base.txt && \
+  python3 -m pip install pipenv --break-system-packages && \
+  python3 -m pip install -r requirements/base.txt --break-system-packages && \
   sed -i 's^#!/usr/bin/env python3^#!/usr/bin/python3^g' theHarvester.py && \
   chmod a+x theHarvester.py && \
   ln -sf /etc/theHarvester/theHarvester.py /usr/local/bin/theharvester
@@ -308,7 +333,7 @@ RUN gem install wpscan
 # xsstrike
 RUN git clone --depth 1 https://github.com/s0md3v/XSStrike.git $TOOLS/xsstrike && \
   cd $TOOLS/xsstrike && \
-  python3 -m pip install -r requirements.txt && \
+  python3 -m pip install -r requirements.txt --break-system-packages && \
   chmod a+x xsstrike.py && \
   ln -sf $TOOLS/xsstrike/xsstrike.py /usr/local/bin/xsstrike
 
