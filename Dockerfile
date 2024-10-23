@@ -12,6 +12,7 @@ ENV GOROOT=/usr/local/go
 ENV GOPATH=/go
 ENV PATH=${HOME}/:${GOPATH}/bin:${GOROOT}/bin:${PATH}
 ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ="Europe/Warsaw"
 
 # Create working dirs
 WORKDIR /root
