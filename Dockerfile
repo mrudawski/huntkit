@@ -349,7 +349,7 @@ RUN ln -sf $( find /go/pkg/mod/github.com/owasp-amass/amass -name wordlists ) $W
   ln -sf /usr/share/brutespray/wordlist $WORDLISTS/brutespray && \
   ln -sf /usr/share/dirb/wordlists $WORDLISTS/dirb && \
   ln -sf /opt/metasploit-framework/embedded/framework/data/wordlists $WORDLISTS/metasploit && \
-  ln -sf /usr/share/nmap/nselib/data/passwords.lst $WORDLISTS/nmap.lst && \
+  ln -sf /usr/share/nmap/nselib/data/passwords.lst $WORDLISTS/nmap.lst
 
 # ------------------------------
 # --- Other utilities ---
